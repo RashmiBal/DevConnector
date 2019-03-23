@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys');
 const passport = require('passport');
+const validateRegisterInput = require('./../../validation/register');
+const validateLoginInput = require('./../../validation/login');
 
 //Load user model
 const User = require('../../models/User');
@@ -15,10 +17,19 @@ const User = require('../../models/User');
 // #desc Register user
 // @access public
 router.post('/register', (req, res) => {
+    const {errors, isValid} = validateRegisterInput(req.body);
+
+    // Check validation
+    if (!isValid){
+        return res.status(400).json(errors);
+    }
+
     User.findOne({email: req.body.email})
     .then(user => {
         if (user) {
-            return res.status(400).json({email: 'Email already exists'})
+            errors.email = 'Email already exists';
+            return res.status(400).json(errors);
+            // return res.status(400).json({email: 'Email already exists'})
         } else {
             const avatar = gravatar.url(req.body.email, {
                 s: '200',
@@ -56,6 +67,13 @@ router.post('/register', (req, res) => {
 // #desc Register user
 // @access public
 router.post('/login', (req,res) => {
+    const {errors, isValid} = validateLoginInput(req.body);
+
+    // Check validation
+    if (!isValid){
+        return res.status(400).json(errors);
+    }
+
     const email = req.body.email;
     const password = req.body.password;
     //equivalent to User.findOne({email : email})
@@ -104,8 +122,13 @@ router.get(
     '/current',
     passport.authenticate('jwt', {session: false}),
     (req, res) => {
-        res.json({msg: 'Success'});
-    }
+        // res.json({msg: 'Success'});
+        res.json({
+            id: req.user.id,
+            name: req.user.name,
+            email: req.user.email
+        });
+}
 )
 
 
