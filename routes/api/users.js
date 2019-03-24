@@ -11,7 +11,8 @@ const validateLoginInput = require('./../../validation/login');
 //Load user model
 const User = require('../../models/User');
 
-// OLD router.get('/test',(req,res) => res.json({msg: 'users api works'}));
+// OLD 
+router.get('/test',(req,res) => res.json({msg: 'users api works'}));
 
 // @route POST api/users/register
 // #desc Register user
@@ -45,11 +46,15 @@ router.post('/register', (req, res) => {
 
             bcrypt.genSalt(10, (err, salt) => {
                 if(err){
-                    return res.status(400).json({password:'Failed Encrypting'});
+                    errors.password = 'Failed Encrypting';
+                    return res.status(400).json(errors);
+                    //return res.status(400).json({password:'Failed Encrypting'});
                 }
                 bcrypt.hash(newUser.password, salt, (err, hash) => {
                     if(err){
-                        return res.status(400).json({password:'Failed Hashing'});
+                        errors.password = 'Failed Hashing';
+                        return res.status(400).json(errors);
+                        // return res.status(400).json({password:'Failed Hashing'});
                     }
                     newUser.password = hash;
                     newUser.save()
@@ -124,6 +129,7 @@ router.get(
     (req, res) => {
         // res.json({msg: 'Success'});
         res.json({
+            msg: 'Success',
             id: req.user.id,
             name: req.user.name,
             email: req.user.email
