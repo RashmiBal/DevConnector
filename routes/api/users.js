@@ -68,7 +68,7 @@ router.post('/register', (req, res) => {
     .catch(err => console.log(err));
 });
 
-// @route POST api/users/register
+// @route POST api/users/login
 // #desc Register user
 // @access public
 router.post('/login', (req,res) => {
