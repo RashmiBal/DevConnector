@@ -1,6 +1,10 @@
-import React, { Component } from 'react'
-import axios from 'axios';
+import React, { Component } from 'react';
+
 import classnames from 'classnames';
+import {connect} from 'react-redux';
+import {registerUser} from '../../actions/authActions';
+import PropTypes from 'prop-types';
+import {withRouter} from 'react-router-dom';
 
 class Register extends Component {
   constructor(){
@@ -20,26 +24,34 @@ class Register extends Component {
       this.setState({[e.target.name]:e.target.value});
     }
 
-    onSubmit(e) {
+    onSubmit(e){
       e.preventDefault();
-      const newUser = {
-        name: this.state.name,
-        email: this.state.email,
+
+      const newUser = {  
+        name: this.state.name,  
+        email: this.state.email,  
         password: this.state.password,
-        password2: this.state.password2
+        password2: this.state.password2 
       };
-      //console.log(newUser);
-      axios.post('/api/users/register', newUser)
-      .then(res => console.log(res.data))
-      .catch(err => this.setState({errors: err.response.data})); //console.log(err.response.data)
-    }
+   
+      this.props.registerUser(newUser, this.props.history);  
+
+      }
   
+  componentWillReceiveProps(nextProps){
+    if (nextProps.errors) {
+      this.setState({errors: nextProps.errors});
+    }
+  }
 
   render() {
     const {errors} = this.state; // same as const errors = this.state.errors;
 
+    //const {user} = this.props.auth // TESTING ONLY
+
     return (
     <div className="register">
+
     <div className="container">
       <div className="row">
         <div className="col-md-8 m-auto">
@@ -72,4 +84,16 @@ class Register extends Component {
     )
   }
 }
-export default Register;
+
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+}
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  errors: state.errors
+})
+
+//export default Register;
+export default connect(mapStateToProps, {registerUser})(withRouter(Register)); // allow to talk to redux
