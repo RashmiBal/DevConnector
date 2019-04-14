@@ -29,7 +29,7 @@ export const loginUser = (userData, history) => dispatch => {
           // decode token to get user data
           const decoded = jwt_decode(token);
           // set redux store
-          dispatch(setCurrentUSer(decoded));
+          dispatch(setCurrentUser(decoded));
 
       })  
       .catch(err => 
@@ -44,4 +44,13 @@ export const setCurrentUser = (decoded) => {
         type: SET_CURRENT_USER,
         payload: decoded
     }
+}
+
+export const logoutUser = () => dispatch => {
+    // Rmeove token from local storage
+    localStorage.removeItem('jwtToken');
+    //Remove auth header
+    setAuthToken(false);
+    //set current user to {} in redux
+    dispatch(setCurrentUser({}));
 }

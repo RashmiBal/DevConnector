@@ -8,6 +8,28 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import store from './store';
 import './App.css';
+import jwt_decode from 'jwt-decode';
+import setAuthToken from './utils/setAuthToken';
+import {setCurrentUser,logoutUser} from './actions/authActions';
+
+// Check for Token
+if (localStorage.jwtToken){
+  // Set auth token header
+  setAuthToken(localStorage.jwtToken);
+  // Decode get user info
+  const decoded = jwt_decode(localStorage.jwtToken);
+  // set user and is Authenticated flag in redux
+  store.dispatch(setCurrentUser(decoded));
+// check for expired token
+const currentTime = Date.now()/1000;
+if(decoded.exp < currentTime){
+  //logout user
+  store.dispatch(logoutUser());
+  //REdirect to login
+  window.location.href = '/login';
+}
+
+}
 
 class App extends Component {
   render() {
